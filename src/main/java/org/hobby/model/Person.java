@@ -48,19 +48,25 @@ public class Person {
     private String address;
 
     @ManyToOne
-    private ZipCode ZipCode;
+    @JoinColumn(name = "zip")
+    private ZipCode zipCode;
 
-    @ManyToMany(mappedBy = "person")
+    @ManyToMany(mappedBy = "persons")
     private List<Hobby> hobbies;
+    public void addAddresstoPerson(ZipCode zipCode){
+        this.setZipCode(zipCode);
+    }
 
-    public Person(String firstName, String lastName, int age, Gender gender, String phone, String email, ZipCode zipCode) {
+
+
+    public Person(String firstName, String lastName, int age, Gender gender, String phone, String email,String address) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
         this.gender = gender;
         this.phone = phone;
         this.email = email;
-        ZipCode = zipCode;
+        this.address= address;
     }
 
 

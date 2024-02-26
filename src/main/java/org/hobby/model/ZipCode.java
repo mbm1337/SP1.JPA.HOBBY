@@ -27,6 +27,7 @@ public class ZipCode {
     @OneToMany(mappedBy = "zipCode")
     private List<Person> persons;
 
+
     public ZipCode(int zip, String city, String regionName, String municipalityName) {
         this.zip = zip;
         this.city = city;
