@@ -6,7 +6,7 @@ entity Address
 
 entity Hobby
 
-User -- Address
-User -- Hobby
+Person -- Address
+Person -- Hobby
 
 @enduml
