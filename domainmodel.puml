@@ -1,10 +1,25 @@
 @startuml
 
-entity Person
+entity Person {
+firstName
+lastName
+age
+gender
+phonenumber
+email
+}
 
-entity Address
+entity Address {
+zip
+city
+regionName
+municipalityName
+}
 
-entity Hobby
+entity Hobby {
+name
+category
+}
 
 Person -- Address : lives on one address
 Person -- Hobby : has one or more hobbies
