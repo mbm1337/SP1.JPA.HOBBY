@@ -26,7 +26,7 @@ public class DAO <T> {
         TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
         return query.getResultList();
     }
-    public List<Person> getPersonsByCity(String zip) {
+    public List<Person> getPersonsByCity(int zip) {
         EntityManager em = emf.createEntityManager();
         String jpql = "SELECT p FROM Person p WHERE p.ZipCode = :zip";
         TypedQuery<Person> query = em.createQuery(jpql, Person.class);
@@ -60,4 +60,6 @@ public class DAO <T> {
             return null;
         }
     }
+
+
 }

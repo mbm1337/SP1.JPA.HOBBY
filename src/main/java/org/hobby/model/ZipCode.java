@@ -34,4 +34,7 @@ public class ZipCode {
         this.municipalityName = municipalityName;
     }
 
+    public ZipCode(String number) {
+        this.zip = zip;
+    }
 }
