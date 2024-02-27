@@ -72,6 +72,19 @@ public class DAO <T> {
         return query.getResultList();
     }
 
+    public Person getPersonByPhoneNumber(String phoneNumber) {
+        EntityManager em = emf.createEntityManager();
+        String jpql = "SELECT p FROM Person p WHERE p.phone = :phoneNumber";
+        TypedQuery<Person> query = em.createQuery(jpql, Person.class);
+        query.setParameter("phoneNumber", phoneNumber);
+        List<Person> resultList = query.getResultList();
+        if (!resultList.isEmpty()) {
+            return resultList.get(0);
+        } else {
+            return null;
+        }
+    }
+
     public Map<String, Integer> countHobbiesPerPersonOnAddress(String address) {
         return em.createQuery(
                         "SELECT p FROM Person p WHERE p.address = :address", Person.class)
@@ -81,7 +94,7 @@ public class DAO <T> {
                         person -> person.getFirstName() + " " + person.getLastName(),
                         person -> person.getHobbies().size()
                 ));
-
+      
     }
 
 }
