@@ -6,18 +6,17 @@ import jakarta.persistence.Query;
 import org.hobby.config.HibernateConfig;
 import org.hobby.model.Hobby;
 import org.hobby.model.Person;
-import org.hobby.model.PostnummerDTO;
+import org.hobby.model.ZipDTO;
 import org.hobby.model.ZipCode;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-
 import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.*;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DAOTest {
 
@@ -25,7 +24,6 @@ class DAOTest {
     private static DAO<Person> personDAO;
     private static DAO<ZipCode> zipCodeDAO;
     private static EntityManager em;
-
 
     @BeforeAll
     static void setUp() {
@@ -40,10 +38,8 @@ class DAOTest {
     }
 
     @AfterAll
-     static void tearDown() {
-
+    public static void tearDown() {
         em.close();
-
     }
 
     @Nested
@@ -51,9 +47,9 @@ class DAOTest {
 
         @Test
         void getPostnummer_ShouldReturnPostnummerDTO() {
-            DAO.PostnummerDAO dao = new DAO.PostnummerDAO();
+
             try {
-                PostnummerDTO postnummer = dao.getPostnummer("1050");
+                ZipDTO postnummer = zipCodeDAO.getZip("2000");
                 assertNotNull(postnummer);
                 assertEquals("1050", postnummer.getNr());
                 assertEquals("København K", postnummer.getNavn());
@@ -61,53 +57,19 @@ class DAOTest {
                 fail("IOException thrown: " + e.getMessage());
             }
         }
+
         @Test
         void getPostnummer_WithInvalidPostnummer_ShouldReturnNull() {
-            DAO.PostnummerDAO dao = new DAO.PostnummerDAO();
+
             try {
-                PostnummerDTO postnummer = dao.getPostnummer("20030"); // Invalid postnummer
+                ZipDTO postnummer = zipCodeDAO.getZip("2000"); // Invalid postnummer
                 assertNull(postnummer);
             } catch (IOException e) {
                 fail("IOException thrown: " + e.getMessage());
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    }
+  
         @Test
         void testGetPersonByPhoneNumber() {
             // Retrieve a person by their phone number
@@ -128,6 +90,15 @@ class DAOTest {
 
 
 }
+
+    // just need to populate the database with hobby data, person data and hobby_person data
+    @Test
+    public void countHobbiesPerPersonOnAddress() {
+        String address = "123 Main St";
+        Map<String, Integer> hobbiesPerPerson = personDAO.countHobbiesPerPersonOnAddress(address);
+        assertEquals(2, hobbiesPerPerson.size()); // Assuming there are two persons with hobbies at this address
+        assertEquals(Integer.valueOf(2), hobbiesPerPerson.get("John Doe")); // John Doe has 2 hobbies
+    }
 
 }
 

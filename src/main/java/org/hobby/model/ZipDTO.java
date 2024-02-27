@@ -2,7 +2,7 @@ package org.hobby.model;
 
 import lombok.Getter;
 @Getter
-public class PostnummerDTO {
+public class ZipDTO {
     private String href;
     private String nr;
     private String navn;
