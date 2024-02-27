@@ -7,6 +7,7 @@ import org.hobby.config.HibernateConfig;
 import org.hobby.model.Hobby;
 import org.hobby.model.Person;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,6 +83,65 @@ public class DAO <T> {
                         person -> person.getHobbies().size()
                 ));
 
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public Map<String, Integer> countPeoplePerHobby() {
+        EntityManager em = emf.createEntityManager();
+        String jpql = "SELECT h.name, COUNT(p.id) FROM Hobby h LEFT JOIN h.persons p GROUP BY h.id";
+        TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
+        List<Object[]> resultList = query.getResultList();
+
+        Map<String, Integer> peoplePerHobby = new HashMap<>();
+        for (Object[] result : resultList) {
+            String hobbyName = (String) result[0];
+            Long count = (Long) result[1];
+            peoplePerHobby.put(hobbyName, count.intValue());
+        }
+        return peoplePerHobby;
     }
 
 }
