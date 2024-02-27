@@ -47,6 +47,8 @@ class DAOTest {
         hobbyDAO = new DAO<>();
         personDAO = new DAO<>();
         zipCodeDAO = new DAO<>();
+        em.getTransaction().begin();
+        em.getTransaction().commit();
 
         // Check if dao is null and instantiate it if necessary
         if (dao == null) {
@@ -65,10 +67,8 @@ class DAOTest {
     public static void tearDown() {
         em.close();
     }
-/*
-    @Nested
-    class PostnummerDAOTest {
 
+   
         @Test
         void getPostnummer_ShouldReturnPostnummerDTO() {
 
@@ -81,6 +81,7 @@ class DAOTest {
                 fail("IOException thrown: " + e.getMessage());
             }
         }
+      
 
         @Test
         void getPostnummer_WithInvalidPostnummer_ShouldReturnNull() {
@@ -92,7 +93,28 @@ class DAOTest {
                 fail("IOException thrown: " + e.getMessage());
             }
         }
-    }*/
+  
+  
+        @Test
+        void testGetPersonByPhoneNumber() {
+            // Retrieve a person by their phone number
+            Person person = personDAO.getPersonByPhoneNumber("1234567890");
+
+            // Verify that the person object is not null
+            assertNotNull(person);
+
+            // Verify that the retrieved person's details are correct
+            assertEquals("John", person.getFirstName());
+            assertEquals("Doe", person.getLastName());
+            assertEquals("1234567890", person.getPhone());
+            assertEquals("123 Main St", person.getAddress());
+            assertEquals("MALE", person.getGender().toString());
+            assertEquals("john.doe@example.com", person.getEmail());
+            assertEquals(2000, person.getZipCode().getZip());
+        }
+
+
+
 
     // just need to populate the database with hobby data, person data and hobby_person data
     @Test
