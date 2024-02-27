@@ -14,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@Builder
 public class Person {
 
     @Id
@@ -54,14 +55,14 @@ public class Person {
     @ManyToMany(mappedBy = "persons")
     private List<Hobby> hobbies;
 
-    public Person(String firstName, String lastName, Date birthDate, Gender gender, String phone, String email, ZipCode zipCode) {
+    public Person(String firstName, String lastName, Date birthDate, Gender gender, String phone, String email, String address) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthDate = birthDate;
         this.gender = gender;
         this.phone = phone;
         this.email = email;
-        ZipCode = zipCode;
+        this.address = address;
     }
 
     public void addHobby(Hobby hobby) {
