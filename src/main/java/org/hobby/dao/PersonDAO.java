@@ -10,23 +10,15 @@ public class PersonDAO {
 
 
 
-    public Person save(Person person){
-
+    public void getAllPhoneNumbers(int id) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        em.persist(person);
-        em.getTransaction().commit();
-        em.close();
-        return person;
-    }
-    public  void getAllInfo(int personID) {
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        Person j = em.createQuery("SELECT p FROM Person p WHERE p.id = :personId", Person.class)
-                .setParameter("personId", personID)
+        String phoneNumber = em.createQuery("SELECT p.phone FROM Person p WHERE p.id = :id", String.class)
+                .setParameter("id", id)
                 .getSingleResult();
-        System.out.println(j);
+        System.out.println("Phone number: " + phoneNumber);
     }
+
 
 
 
