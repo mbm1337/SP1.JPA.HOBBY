@@ -24,7 +24,7 @@ public class ZipCode {
     @Column(name = "municipality_name")
     private String municipalityName;
 
-    @OneToMany(mappedBy = "zipCode")
+    @OneToMany(mappedBy = "ZipCode")
     private List<Person> persons;
 
     public ZipCode(int zip, String city, String regionName, String municipalityName) {

@@ -2,52 +2,66 @@ package org.hobby.dao;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.TypedQuery;
 import org.hobby.config.HibernateConfig;
-import org.hobby.model.Hobby;
+import org.hobby.model.Person;
+import org.hobby.model.PostnummerDTO;
+import com.google.gson.Gson;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import java.util.List;
 
 public class DAO <T> {
 
-    EntityManagerFactory emf = HibernateConfig.getEntityManagerFactoryConfig();
+    private EntityManagerFactory emf = HibernateConfig.getEntityManagerFactoryConfig();
 
-    public void save(T t) {
+
+    public List<Object[]> getAllPostcodesAndCities() {
         EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        em.persist(t);
-        em.getTransaction().commit();
-        em.close();
+        String jpql = "SELECT DISTINCT z.zip, z.city FROM ZipCode z";
+        TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
+        return query.getResultList();
+    }
+    public List<Person> getPersonsByCity(String zip) {
+        EntityManager em = emf.createEntityManager();
+        String jpql = "SELECT p FROM Person p WHERE p.ZipCode = :zip";
+        TypedQuery<Person> query = em.createQuery(jpql, Person.class);
+        query.setParameter("zip", zip);
+        return query.getResultList();
     }
 
-    public T findById(int id, Class<T> t) {
-        EntityManager em = emf.createEntityManager();
-        T foundT = em.find(t, id);
-        em.close();
-        return foundT;
-    }
+    public static class PostnummerDAO {
 
-    public void delete(T t) {
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        em.remove(t);
-        em.getTransaction().commit();
-        em.close();
-    }
+        private final String API_URL = "https://api.dataforsyningen.dk/postnumre/";
 
-    public void update(T t) {
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        em.merge(t);
-        em.getTransaction().commit();
-        em.close();
-    }
+        public PostnummerDTO getPostnummer(String nr) throws IOException {
+            String apiUrl = API_URL + nr;
+            URL url = new URL(apiUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
 
-    public int getNumberOfPeopleWithHobby(Hobby hobby) {
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        int numberOfPeople = em.createQuery("SELECT p FROM Person p WHERE :hobby MEMBER OF p.hobbies", Hobby.class).setParameter("hobby", hobby).getResultList().size();
-        em.getTransaction().commit();
-        em.close();
-        return numberOfPeople;
-    }
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
 
+                Gson gson = new Gson();
+                return gson.fromJson(response.toString(), PostnummerDTO.class);
+            } else {
+                System.out.println("Fejl ved forespørgsel til API. Statuskode: " + responseCode);
+                return null;
+            }
+        }
+
+    }
 
 }
