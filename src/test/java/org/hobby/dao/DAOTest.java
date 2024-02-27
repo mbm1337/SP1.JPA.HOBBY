@@ -8,6 +8,7 @@ import org.hobby.model.Hobby;
 import org.hobby.model.Person;
 import org.hobby.model.PostnummerDTO;
 import org.hobby.model.ZipCode;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
@@ -33,20 +34,16 @@ class DAOTest {
         hobbyDAO = new DAO<>();
         personDAO = new DAO<>();
         zipCodeDAO = new DAO<>();
-        Query query1 = em.createNativeQuery("DELETE FROM person");
-        Query query2 = em.createNativeQuery("DELETE FROM hobby");
+        Query query = em.createNativeQuery("DELETE FROM person");
         em.getTransaction().begin();
-        query1.executeUpdate();
-        query2.executeUpdate();
+        query.executeUpdate();
         em.getTransaction().commit();
-
 
     }
 
+    @AfterAll
+     static void tearDown() {
 
-
-    @AfterEach
-    void tearDown() {
         em.close();
 
     }
@@ -78,4 +75,7 @@ class DAOTest {
         }
 
 
-}}
+}
+
+}
+
