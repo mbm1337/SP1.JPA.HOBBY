@@ -50,7 +50,7 @@ public class Person {
     @ManyToOne
     private ZipCode ZipCode;
 
-    @ManyToMany(mappedBy = "person")
+    @ManyToMany(mappedBy = "persons")
     private List<Hobby> hobbies;
 
     public Person(String firstName, String lastName, int age, Gender gender, String phone, String email, ZipCode zipCode) {
