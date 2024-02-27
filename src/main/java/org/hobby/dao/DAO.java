@@ -130,8 +130,7 @@ public class DAO <T> {
 
 
     public Map<String, Integer> countPeoplePerHobby() {
-        EntityManager em = emf.createEntityManager();
-        String jpql = "SELECT h.name, COUNT(p.id) FROM Hobby h LEFT JOIN h.persons p GROUP BY h.id";
+        String jpql = "SELECT h.name, COUNT(p.id) FROM Hobby h LEFT JOIN h.persons p GROUP BY h.name";
         TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
         List<Object[]> resultList = query.getResultList();
 

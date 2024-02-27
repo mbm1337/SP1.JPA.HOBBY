@@ -18,6 +18,7 @@ import java.io.IOException;
 import static javax.management.Query.eq;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,20 +40,24 @@ class DAOTest {
     private static DAO dao;
 
     @BeforeAll
-    static void setUp() {
+    static void setUp() throws NoSuchFieldException, IllegalAccessException {
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactoryConfig();
-        em = emf.createEntityManager();
+        em = mock(EntityManager.class);
+
         hobbyDAO = new DAO<>();
         personDAO = new DAO<>();
         zipCodeDAO = new DAO<>();
-        em.getTransaction().begin();
-        em.getTransaction().commit();
 
+        // Check if dao is null and instantiate it if necessary
+        if (dao == null) {
+            dao = new DAO();
+        }
 
-        dao = new DAO();
-        em = mock(EntityManager.class);
-        dao.emf = mock(EntityManagerFactory.class);
-        dao.em = em;
+        // Set the dao.em field directly using reflection
+        Field emField = DAO.class.getDeclaredField("em");
+        emField.setAccessible(true);
+        emField.set(dao, em);
+
         typedQuery = mock(TypedQuery.class);
     }
 
@@ -119,12 +124,9 @@ class DAOTest {
     private List<Object[]> getMockResultList() {
         List<Object[]> resultList = new ArrayList<>();
         // Mock data for "Reading" hobby
-        resultList.add(new Object[]{"Reading", 1L});
         resultList.add(new Object[]{"Reading", 2L});
         // Mock data for "Gardening" hobby
         resultList.add(new Object[]{"Gardening", 3L});
-        resultList.add(new Object[]{"Gardening", 4L});
-        resultList.add(new Object[]{"Gardening", 5L});
         return resultList;
     }
 
