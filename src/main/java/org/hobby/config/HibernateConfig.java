@@ -19,7 +19,7 @@ public class HibernateConfig {
     private static EntityManagerFactory entityManagerFactory;
 
 
-    private static EntityManagerFactory buildEntityFactoryConfig() {
+    public static EntityManagerFactory buildEntityFactoryConfig() {
         try {
             Configuration configuration = new Configuration();
 
