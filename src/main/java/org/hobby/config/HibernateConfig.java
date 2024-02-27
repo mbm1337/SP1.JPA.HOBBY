@@ -6,6 +6,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
+import org.hobby.model.Hobby;
+import org.hobby.model.Person;
+import org.hobby.model.ZipCode;
 
 import java.util.Properties;
 
@@ -57,6 +60,10 @@ public class HibernateConfig {
     private static void getAnnotationConfiguration(Configuration configuration) {
         // add annotated classes
         //configuration.addAnnotatedClass(Object.class);
+        configuration.addAnnotatedClass(Person.class);
+        configuration.addAnnotatedClass(ZipCode.class);
+        configuration.addAnnotatedClass(Hobby.class);
+
 
     }
 
