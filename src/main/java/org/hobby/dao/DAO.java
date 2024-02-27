@@ -34,6 +34,19 @@ public class DAO <T> {
         return query.getResultList();
     }
 
+    public Person getPersonByPhoneNumber(String phoneNumber) {
+        EntityManager em = emf.createEntityManager();
+        String jpql = "SELECT p FROM Person p WHERE p.phone = :phoneNumber";
+        TypedQuery<Person> query = em.createQuery(jpql, Person.class);
+        query.setParameter("phoneNumber", phoneNumber);
+        List<Person> resultList = query.getResultList();
+        if (!resultList.isEmpty()) {
+            return resultList.get(0);
+        } else {
+            return null;
+        }
+    }
+
     public static class PostnummerDAO {
 
         private final String API_URL = "https://api.dataforsyningen.dk/postnumre/";
