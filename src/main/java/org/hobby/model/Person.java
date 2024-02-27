@@ -63,15 +63,32 @@ public class Person {
         ZipCode = zipCode;
     }
 
+    public void addHobby(Hobby hobby) {
+        this.hobbies.add(hobby);
+        if (hobby != null) {
+            hobby.getPersons().add(this);
+        }
+    }
 
+    public void removeHobby(Hobby hobby) {
+        this.hobbies.remove(hobby);
+        if (hobby != null) {
+            hobby.getPersons().remove(this);
+        }
+    }
 
+    public void setZipCode(ZipCode zipCode) {
+        ZipCode = zipCode;
+        if (zipCode != null) {
+            zipCode.getPersons().add(this);
+        }
+    }
 
-
-
-
-
-
-
-
+    public void removeZipCode(ZipCode zipCode) {
+        ZipCode = zipCode;
+        if (zipCode != null) {
+            zipCode.getPersons().remove(this);
+        }
+    }
 
 }
