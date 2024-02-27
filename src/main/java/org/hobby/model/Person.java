@@ -4,6 +4,7 @@ package org.hobby.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -25,8 +26,8 @@ public class Person {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "age")
-    private int age;
+    @Column(name = "birth_date")
+    private Date birthDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
@@ -50,13 +51,13 @@ public class Person {
     @ManyToOne
     private ZipCode ZipCode;
 
-    @ManyToMany(mappedBy = "person")
+    @ManyToMany(mappedBy = "persons")
     private List<Hobby> hobbies;
 
-    public Person(String firstName, String lastName, int age, Gender gender, String phone, String email, ZipCode zipCode) {
+    public Person(String firstName, String lastName, Date birthDate, Gender gender, String phone, String email, ZipCode zipCode) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.age = age;
+        this.birthDate = birthDate;
         this.gender = gender;
         this.phone = phone;
         this.email = email;
