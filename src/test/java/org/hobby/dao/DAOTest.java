@@ -6,10 +6,9 @@ import jakarta.persistence.Query;
 import org.hobby.config.HibernateConfig;
 import org.hobby.model.Hobby;
 import org.hobby.model.Person;
-import org.hobby.model.PostnummerDTO;
+import org.hobby.model.ZipDTO;
 import org.hobby.model.ZipCode;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -53,9 +52,9 @@ class DAOTest {
 
         @Test
         void getPostnummer_ShouldReturnPostnummerDTO() {
-            DAO.PostnummerDAO dao = new DAO.PostnummerDAO();
+
             try {
-                PostnummerDTO postnummer = dao.getPostnummer("1050");
+                ZipDTO postnummer = zipCodeDAO.getZip("2000");
                 assertNotNull(postnummer);
                 assertEquals("1050", postnummer.getNr());
                 assertEquals("København K", postnummer.getNavn());
@@ -65,9 +64,9 @@ class DAOTest {
         }
         @Test
         void getPostnummer_WithInvalidPostnummer_ShouldReturnNull() {
-            DAO.PostnummerDAO dao = new DAO.PostnummerDAO();
+
             try {
-                PostnummerDTO postnummer = dao.getPostnummer("20030"); // Invalid postnummer
+                ZipDTO postnummer = zipCodeDAO.getZip("2000"); // Invalid postnummer
                 assertNull(postnummer);
             } catch (IOException e) {
                 fail("IOException thrown: " + e.getMessage());

@@ -5,7 +5,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.TypedQuery;
 import org.hobby.config.HibernateConfig;
 import org.hobby.model.Person;
-import org.hobby.model.PostnummerDTO;
+import org.hobby.model.ZipDTO;
 import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,34 +34,30 @@ public class DAO <T> {
         return query.getResultList();
     }
 
-    public static class PostnummerDAO {
 
-        private final String API_URL = "https://api.dataforsyningen.dk/postnumre/";
+    public ZipDTO getZip(String nr) throws IOException {
+        String API_URL = "https://api.dataforsyningen.dk/postnumre/";
 
-        public PostnummerDTO getPostnummer(String nr) throws IOException {
-            String apiUrl = API_URL + nr;
-            URL url = new URL(apiUrl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
+        String apiUrl = API_URL + nr;
+        URL url = new URL(apiUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
 
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-                reader.close();
-
-                Gson gson = new Gson();
-                return gson.fromJson(response.toString(), PostnummerDTO.class);
-            } else {
-                System.out.println("Fejl ved forespørgsel til API. Statuskode: " + responseCode);
-                return null;
+        int responseCode = connection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
             }
+            reader.close();
+
+            Gson gson = new Gson();
+            return gson.fromJson(response.toString(), ZipDTO.class);
+        } else {
+            System.out.println("Fejl ved forespørgsel til API. Statuskode: " + responseCode);
+            return null;
         }
-
     }
-
 }
