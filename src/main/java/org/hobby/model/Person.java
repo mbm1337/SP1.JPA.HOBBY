@@ -92,4 +92,18 @@ public class Person {
         }
     }
 
+    @PrePersist
+    public void validate() {
+        if (this.email == null || this.email.isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+    }
+
+    @PreUpdate
+    public void validateUpdate() {
+        if (this.email == null || this.email.isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+    }
+
 }

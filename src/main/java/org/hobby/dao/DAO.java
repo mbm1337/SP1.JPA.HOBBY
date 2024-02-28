@@ -23,9 +23,6 @@ public class DAO <T> {
 
     EntityManagerFactory emf = HibernateConfig.getEntityManagerFactoryConfig();
 
-    EntityManager em = emf.createEntityManager();
-
-
     public void save(T t) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
@@ -97,6 +94,7 @@ public class DAO <T> {
     }
 
     public Map<String, Integer> countHobbiesPerPersonOnAddress(String address) {
+        EntityManager em = emf.createEntityManager();
         return em.createQuery(
                         "SELECT p FROM Person p WHERE p.address = :address", Person.class)
                 .setParameter("address", address)
@@ -109,6 +107,7 @@ public class DAO <T> {
     }
 
     public Map<String, Integer> countPeoplePerHobby() {
+        EntityManager em = emf.createEntityManager();
         String jpql = "SELECT h.name, COUNT(p.id) FROM Hobby h LEFT JOIN h.persons p GROUP BY h.name";
         TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
         List<Object[]> resultList = query.getResultList();
@@ -120,6 +119,7 @@ public class DAO <T> {
             peoplePerHobby.put(hobbyName, count.intValue());
         }
         return peoplePerHobby;
+
     }
 
     public ZipDTO getZip(String nr) throws IOException {
@@ -153,9 +153,6 @@ public class DAO <T> {
             query.setParameter("id", id);
 
             return (String) query.getSingleResult();
-
-
-
         }
     }
 
@@ -167,6 +164,18 @@ public class DAO <T> {
                 .getSingleResult();
         return  person;
     }
+
+    public List<Person> allPersonWithAGivenHobby(String hobbyName) {
+        try (EntityManager em = emf.createEntityManager()) {
+            Query query = em.createQuery("SELECT h FROM Hobby h " +
+                    "JOIN  h.persons p " +
+                    "WHERE h.name = :hobbyName");
+            query.setParameter("hobbyName", hobbyName);
+            return query.getResultList();
+
+        }
+    }
+
 }
 
 

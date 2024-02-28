@@ -28,6 +28,7 @@ public class ZipCode {
     @OneToMany(mappedBy = "ZipCode")
     private List<Person> persons = new ArrayList<>();
 
+
     public ZipCode(int zip, String city, String regionName, String municipalityName) {
         this.zip = zip;
         this.city = city;

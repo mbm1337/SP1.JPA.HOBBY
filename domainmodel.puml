@@ -1,12 +1,35 @@
 @startuml
 
-entity Person
+entity Person {
 
-entity Address
+  *FirstName
+  *LastName
+  *Email
+  *Phone
+  *ZipCode
+  *Hobbies
+  *DateOfBirth
+  *Address
+  *Gender
+
+}
+
+entity ZipCode{
+    *ZipCode
+    *City
+    *regionName
+    *municipality
+    }
 
 entity Hobby
+{
+    *Name
+    *WikiLink
+    *Category
+    *Type
+}
 
-User -- Address
-User -- Hobby
+Person "many"--"1" ZipCode
+Person "many"--"many" Hobby
 
 @enduml
