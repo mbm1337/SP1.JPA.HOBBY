@@ -23,8 +23,6 @@ public class DAO <T> {
 
     EntityManagerFactory emf = HibernateConfig.getEntityManagerFactoryConfig();
 
-
-
     public void save(T t) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
