@@ -3,6 +3,7 @@ package org.hobby.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,8 +25,8 @@ public class ZipCode {
     @Column(name = "municipality_name")
     private String municipalityName;
 
-    @OneToMany(mappedBy = "zipCode")
-    private List<Person> persons;
+    @OneToMany(mappedBy = "ZipCode")
+    private List<Person> persons = new ArrayList<>();
 
 
     public ZipCode(int zip, String city, String regionName, String municipalityName) {

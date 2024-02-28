@@ -1,0 +1,12 @@
+@startuml
+
+entity Person
+
+entity Address
+
+entity Hobby
+
+User -- Address
+User -- Hobby
+
+@enduml

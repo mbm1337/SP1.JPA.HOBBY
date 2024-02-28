@@ -19,7 +19,7 @@ public class HibernateConfig {
     private static EntityManagerFactory entityManagerFactory;
 
 
-    private static EntityManagerFactory buildEntityFactoryConfig() {
+    public static EntityManagerFactory buildEntityFactoryConfig() {
         try {
             Configuration configuration = new Configuration();
 
@@ -60,9 +60,11 @@ public class HibernateConfig {
     private static void getAnnotationConfiguration(Configuration configuration) {
         // add annotated classes
         //configuration.addAnnotatedClass(Object.class);
-        configuration.addAnnotatedClass(Hobby.class);
         configuration.addAnnotatedClass(Person.class);
         configuration.addAnnotatedClass(ZipCode.class);
+        configuration.addAnnotatedClass(Hobby.class);
+
+
     }
 
     public static EntityManagerFactory getEntityManagerFactoryConfig() {

@@ -4,8 +4,7 @@ package org.hobby.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "person")
@@ -14,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@Builder
 public class Person {
 
     @Id
@@ -26,8 +26,8 @@ public class Person {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "age")
-    private int age;
+    @Column(name = "birth_date")
+    private Date birthDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
@@ -48,44 +48,48 @@ public class Person {
     @Column(name = "address")
     private String address;
 
-    @ManyToOne
-    @JoinColumn(name = "zip")
-    private ZipCode zipCode;
+    @ManyToOne(cascade = CascadeType.ALL)
+    private ZipCode ZipCode;
 
-    @ManyToMany(mappedBy = "persons")
-    private HashSet<Hobby> hobbies = new HashSet<>();
-    public void addAddresstoPerson(ZipCode zipCode){
-        this.setZipCode(zipCode);
-    }
-    public void addHobby(Hobby hobby){
-        if(hobby != null)
-        hobbies.add(hobby);
-        }
+    @ManyToMany(mappedBy = "persons",cascade = CascadeType.ALL)
+    private Set<Hobby> hobbies = new HashSet<>();
 
-
-
-
-
-
-    public Person(String firstName, String lastName, int age, Gender gender, String phone, String email,String address) {
+    public Person(String firstName, String lastName, Date birthDate, Gender gender, String phone, String email, String address) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.age = age;
+        this.birthDate = birthDate;
         this.gender = gender;
         this.phone = phone;
         this.email = email;
-        this.address= address;
+        this.address = address;
     }
 
+    public void addHobby(Hobby hobby) {
+        this.hobbies.add(hobby);
+        if (hobby != null) {
+            hobby.getPersons().add(this);
+        }
+    }
 
+    public void removeHobby(Hobby hobby) {
+        this.hobbies.remove(hobby);
+        if (hobby != null) {
+            hobby.getPersons().remove(this);
+        }
+    }
 
+    public void setZipCode(ZipCode zipCode) {
+        ZipCode = zipCode;
+        if (zipCode != null) {
+            zipCode.getPersons().add(this);
+        }
+    }
 
-
-
-
-
-
-
-
+    public void removeZipCode(ZipCode zipCode) {
+        ZipCode = zipCode;
+        if (zipCode != null) {
+            zipCode.getPersons().remove(this);
+        }
+    }
 
 }

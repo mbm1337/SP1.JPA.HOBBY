@@ -3,7 +3,10 @@ package org.hobby.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "hobby")
@@ -30,15 +33,8 @@ public class Hobby {
     @Column(name = "type")
     private String type;
 
-    @ManyToMany
-    private List<Person> persons;
-
-    public Hobby(String name, String wikiLink, String category, String type) {
-        this.name = name;
-        this.wikiLink = wikiLink;
-        this.category = category;
-        this.type = type;
-    }
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Person> persons = new HashSet<>();
 
 
 }
