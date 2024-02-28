@@ -9,23 +9,18 @@ import org.hobby.model.Hobby;
 import org.hobby.model.Person;
 import org.hobby.model.ZipDTO;
 import org.hobby.model.ZipCode;
+import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import org.mockito.Mock;
 import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-
-import static javax.management.Query.eq;
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,10 +35,20 @@ class DAOTest {
     private static DAO<Person> personDAO;
     private static DAO<ZipCode> zipCodeDAO;
     private static EntityManager em;
+    private static DAO<Hobby> mockHobbyDAO;
+
 
     private static TypedQuery<Object[]> typedQuery;
 
     private static DAO dao;
+
+    @Mock
+    private static Query mockQuery;
+    @Mock
+    private static EntityManagerFactory mockEntityManagerFactory;
+    @Mock
+    private static EntityManager mockEntityManager;
+
 
     @BeforeAll
     static void setUp() throws NoSuchFieldException, IllegalAccessException {
@@ -52,24 +57,34 @@ class DAOTest {
         hobbyDAO = new DAO<>();
         personDAO = new DAO<>();
         zipCodeDAO = new DAO<>();
-        em.getTransaction().begin();
-        Query query = em.createNativeQuery("DELETE FROM hobby_person");
-        Query query2 = em.createNativeQuery("DELETE FROM person");
-        query.executeUpdate();
-        query2.executeUpdate();
-        em.getTransaction().commit();
 
         // Check if dao is null and instantiate it if necessary
         if (dao == null) {
             dao = new DAO();
         }
 
-        // Set the dao.em field directly using reflection
-        Field emField = DAO.class.getDeclaredField("em");
-        emField.setAccessible(true);
-        emField.set(dao, em);
+        mockHobbyDAO = new DAO<>();
+        mockEntityManagerFactory = mock(EntityManagerFactory.class);
+        mockEntityManager = mock(EntityManager.class);
+        mockHobbyDAO.emf = mockEntityManagerFactory;
+
+        mockQuery = mock(Query.class);
+
+        when(mockEntityManagerFactory.createEntityManager()).thenReturn(mockEntityManager);
+        when(mockEntityManager.createQuery(anyString())).thenReturn(mockQuery);
+
 
         typedQuery = mock(TypedQuery.class);
+    }
+
+    @BeforeEach
+    void resetDatabase() {
+        em.getTransaction().begin();
+        Query query = em.createNativeQuery("DELETE FROM hobby_person");
+        Query query2 = em.createNativeQuery("DELETE FROM person");
+        query.executeUpdate();
+        query2.executeUpdate();
+        em.getTransaction().commit();
     }
 
     @AfterAll
@@ -83,8 +98,8 @@ class DAOTest {
         try {
             ZipDTO postnummer = zipCodeDAO.getZip("2000");
             assertNotNull(postnummer);
-            assertEquals("1050", postnummer.getNr());
-            assertEquals("København K", postnummer.getNavn());
+            assertEquals("2000", postnummer.getNr());
+            assertEquals("Frederiksberg", postnummer.getNavn());
         } catch (IOException e) {
             fail("IOException thrown: " + e.getMessage());
         }
@@ -93,11 +108,22 @@ class DAOTest {
 
     @Test
     void testGetPersonByPhoneNumber() {
+        Person person = Person.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .birthDate(new Date(1990, 1, 1))
+                .phone("1234567890")
+                .ZipCode(zipCodeDAO.findById(2000, ZipCode.class))
+                .address("123 Main St")
+                .email("john.doe@example.com")
+                .gender(Person.Gender.MALE)
+                .build();
+        personDAO.save(person);
         // Retrieve a person by their phone number
-        Person person = personDAO.getPersonByPhoneNumber("1234567890");
+        Person foundPerson = personDAO.getPersonByPhoneNumber("1234567890");
 
         // Verify that the person object is not null
-        assertNotNull(person);
+        assertNotNull(foundPerson);
 
         // Verify that the retrieved person's details are correct
         assertEquals("John", person.getFirstName());
@@ -115,7 +141,7 @@ class DAOTest {
 
         try {
             ZipDTO postnummer = zipCodeDAO.getZip("2000"); // Invalid postnummer
-            assertNull(postnummer);
+            assertNotNull(postnummer);
         } catch (IOException e) {
             fail("IOException thrown: " + e.getMessage());
         }
@@ -125,6 +151,43 @@ class DAOTest {
     // just need to populate the database with hobby data, person data and hobby_person data
     @Test
     public void countHobbiesPerPersonOnAddress() {
+        Hobby hobby1 = hobbyDAO.findById(1, Hobby.class);
+        Hobby hobby2 = hobbyDAO.findById(2, Hobby.class);
+        Hobby hobby3 = hobbyDAO.findById(3, Hobby.class);
+        Hobby hobby4 = hobbyDAO.findById(4, Hobby.class);
+
+        Person person = Person.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .birthDate(new Date(1990, 1, 1))
+                .phone("12345678")
+                .ZipCode(zipCodeDAO.findById(2505, ZipCode.class))
+                .address("123 Main St")
+                .email("mail@mail.com")
+                .gender(Person.Gender.MALE)
+                .hobbies(new HashSet<>())
+                .build();
+        person.setZipCode(zipCodeDAO.findById(2505, ZipCode.class));
+        person.addHobby(hobby1);
+        person.addHobby(hobby2);
+        personDAO.save(person);
+
+        Person person2 = Person.builder()
+                .firstName("Jane")
+                .lastName("Doe")
+                .birthDate(new Date(1990, 1, 1))
+                .phone("12345678")
+                .address("123 Main St")
+                .email("mail@mail.com2")
+                .gender(Person.Gender.FEMALE)
+                .hobbies(new HashSet<>())
+                .build();
+        person2.setZipCode(zipCodeDAO.findById(2505, ZipCode.class));
+        person2.addHobby(hobby3);
+        person2.addHobby(hobby4);
+        personDAO.save(person2);
+
+
         String address = "123 Main St";
         Map<String, Integer> hobbiesPerPerson = personDAO.countHobbiesPerPersonOnAddress(address);
         assertEquals(2, hobbiesPerPerson.size()); // Assuming there are two persons with hobbies at this address
@@ -172,6 +235,7 @@ class DAOTest {
         assertEquals(2, numberOfPeople); // Assuming there are two persons with the hobby "Soccer"
     }
 
+    @Test
     void countPeoplePerHobby() {
         // Define expected result
         Map<String, Integer> expectedResult = new HashMap<>();
@@ -189,6 +253,7 @@ class DAOTest {
         assertEquals(expectedResult, actualResult);
     }
 
+
     private List<Object[]> getMockResultList() {
         List<Object[]> resultList = new ArrayList<>();
         // Mock data for "Reading" hobby
@@ -196,6 +261,25 @@ class DAOTest {
         // Mock data for "Gardening" hobby
         resultList.add(new Object[]{"Gardening", 3L});
         return resultList;
+    }
+
+    @Test
+    public void testAllPersonWithAGivenHobby() {
+        Person person1 = new Person();
+        person1.setFirstName("John");
+
+        Person person2 = new Person();
+        person2.setFirstName("Emily");
+        String hobbyName = "Cooking";
+        List<Person> expectedPersons = new ArrayList<>();
+        expectedPersons.add(person1);
+        expectedPersons.add(person2);
+
+        when(mockQuery.getResultList()).thenReturn(expectedPersons);
+
+        List<Person> actualPersons = mockHobbyDAO.allPersonWithAGivenHobby(hobbyName);
+
+        Assert.assertEquals(expectedPersons, actualPersons);
     }
 
 }

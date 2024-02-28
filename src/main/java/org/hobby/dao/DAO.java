@@ -3,6 +3,7 @@ package org.hobby.dao;
 import com.google.gson.Gson;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.hobby.config.HibernateConfig;
 import org.hobby.model.Hobby;
@@ -22,7 +23,6 @@ public class DAO <T> {
 
     EntityManagerFactory emf = HibernateConfig.getEntityManagerFactoryConfig();
 
-    EntityManager em = emf.createEntityManager();
 
 
     public void save(T t) {
@@ -96,6 +96,7 @@ public class DAO <T> {
     }
 
     public Map<String, Integer> countHobbiesPerPersonOnAddress(String address) {
+        EntityManager em = emf.createEntityManager();
         return em.createQuery(
                         "SELECT p FROM Person p WHERE p.address = :address", Person.class)
                 .setParameter("address", address)
@@ -108,50 +109,8 @@ public class DAO <T> {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public Map<String, Integer> countPeoplePerHobby() {
+        EntityManager em = emf.createEntityManager();
         String jpql = "SELECT h.name, COUNT(p.id) FROM Hobby h LEFT JOIN h.persons p GROUP BY h.name";
         TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
         List<Object[]> resultList = query.getResultList();
@@ -163,6 +122,7 @@ public class DAO <T> {
             peoplePerHobby.put(hobbyName, count.intValue());
         }
         return peoplePerHobby;
+
     }
 
     public ZipDTO getZip(String nr) throws IOException {
@@ -188,6 +148,17 @@ public class DAO <T> {
         } else {
             System.out.println("Fejl ved forespørgsel til API. Statuskode: " + responseCode);
             return null;
+        }
+    }
+
+    public List<Person> allPersonWithAGivenHobby(String hobbyName) {
+        try (EntityManager em = emf.createEntityManager()) {
+            Query query = em.createQuery("SELECT h FROM Hobby h " +
+                    "JOIN  h.persons p " +
+                    "WHERE h.name = :hobbyName");
+            query.setParameter("hobbyName", hobbyName);
+            return query.getResultList();
+
         }
     }
 
