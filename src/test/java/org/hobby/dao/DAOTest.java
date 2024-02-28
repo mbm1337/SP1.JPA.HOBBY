@@ -262,7 +262,27 @@ class DAOTest {
         resultList.add(new Object[]{"Gardening", 3L});
         return resultList;
     }
+    @Test
+    void testGetPhoneNumber() {
 
+
+        Person p = new Person("John", "Doe", new Date(), Person.Gender.MALE, "1234567890", "john.doe@example.com", "123 Main St");
+        p.setId(2);
+        String phoneNumber = personDAO.getPhoneNumber(2);
+
+        String expectedPhoneNumber = "1234567890";
+        assertEquals(expectedPhoneNumber, phoneNumber);
+
+    }
+    @Test
+    void  testgetALlInfoPerson(){
+        Person expected = new Person("John", "Doe", new Date(), Person.Gender.MALE, "1234567890", "john.doe@example.com", "123 Main St");
+        expected.setId(2);
+        Person actualperson = dao.getAllInfo(2);
+        assertNotNull(expected);
+        assertEquals(expected, actualperson);
+    }
+  
     @Test
     public void testAllPersonWithAGivenHobby() {
         Person person1 = new Person();
