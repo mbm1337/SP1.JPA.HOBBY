@@ -4,6 +4,7 @@ package org.hobby.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Entity
@@ -52,10 +53,17 @@ public class Person {
     private ZipCode zipCode;
 
     @ManyToMany(mappedBy = "persons")
-    private List<Hobby> hobbies;
+    private HashSet<Hobby> hobbies = new HashSet<>();
     public void addAddresstoPerson(ZipCode zipCode){
         this.setZipCode(zipCode);
     }
+    public void addHobby(Hobby hobby){
+        if(hobby != null)
+        hobbies.add(hobby);
+        }
+
+
+
 
 
 
