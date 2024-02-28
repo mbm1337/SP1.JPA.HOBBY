@@ -48,17 +48,15 @@ class DAOTest {
     @BeforeAll
     static void setUp() throws NoSuchFieldException, IllegalAccessException {
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactoryConfig();
-        em = mock(EntityManager.class);
-
+        em = emf.createEntityManager();
         hobbyDAO = new DAO<>();
         personDAO = new DAO<>();
         zipCodeDAO = new DAO<>();
+        em.getTransaction().begin();
         Query query = em.createNativeQuery("DELETE FROM hobby_person");
         Query query2 = em.createNativeQuery("DELETE FROM person");
-        em.getTransaction().begin();
         query.executeUpdate();
         query2.executeUpdate();
-        em.getTransaction().begin();
         em.getTransaction().commit();
 
         // Check if dao is null and instantiate it if necessary
