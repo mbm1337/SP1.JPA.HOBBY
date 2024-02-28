@@ -8,12 +8,12 @@ import org.hobby.config.HibernateConfig;
 import org.hobby.model.Hobby;
 import org.hobby.model.Person;
 import org.hobby.model.ZipDTO;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,6 +82,19 @@ public class DAO <T> {
         return query.getResultList();
     }
 
+    public Person getPersonByPhoneNumber(String phoneNumber) {
+        EntityManager em = emf.createEntityManager();
+        String jpql = "SELECT p FROM Person p WHERE p.phone = :phoneNumber";
+        TypedQuery<Person> query = em.createQuery(jpql, Person.class);
+        query.setParameter("phoneNumber", phoneNumber);
+        List<Person> resultList = query.getResultList();
+        if (!resultList.isEmpty()) {
+            return resultList.get(0);
+        } else {
+            return null;
+        }
+    }
+
     public Map<String, Integer> countHobbiesPerPersonOnAddress(String address) {
         return em.createQuery(
                         "SELECT p FROM Person p WHERE p.address = :address", Person.class)
@@ -91,7 +104,65 @@ public class DAO <T> {
                         person -> person.getFirstName() + " " + person.getLastName(),
                         person -> person.getHobbies().size()
                 ));
+      
+    }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public Map<String, Integer> countPeoplePerHobby() {
+        String jpql = "SELECT h.name, COUNT(p.id) FROM Hobby h LEFT JOIN h.persons p GROUP BY h.name";
+        TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
+        List<Object[]> resultList = query.getResultList();
+
+        Map<String, Integer> peoplePerHobby = new HashMap<>();
+        for (Object[] result : resultList) {
+            String hobbyName = (String) result[0];
+            Long count = (Long) result[1];
+            peoplePerHobby.put(hobbyName, count.intValue());
+        }
+        return peoplePerHobby;
     }
 
     public ZipDTO getZip(String nr) throws IOException {
