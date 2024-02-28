@@ -106,7 +106,6 @@ public class DAO <T> {
       
     }
 
-
     public Map<String, Integer> countPeoplePerHobby() {
         EntityManager em = emf.createEntityManager();
         String jpql = "SELECT h.name, COUNT(p.id) FROM Hobby h LEFT JOIN h.persons p GROUP BY h.name";
@@ -148,6 +147,23 @@ public class DAO <T> {
             return null;
         }
     }
+    public String getPhoneNumber(int id) {
+        try (EntityManager em = emf.createEntityManager()) {
+            Query query = em.createQuery("SELECT p.phone FROM Person p WHERE p.id = :id", String.class);
+            query.setParameter("id", id);
+
+            return (String) query.getSingleResult();
+        }
+    }
+
+    public  Person getAllInfo(int personID) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        Person person = em.createQuery("SELECT p FROM Person p WHERE p.id = :personId", Person.class)
+                .setParameter("personId", personID)
+                .getSingleResult();
+        return  person;
+    }
 
     public List<Person> allPersonWithAGivenHobby(String hobbyName) {
         try (EntityManager em = emf.createEntityManager()) {
@@ -161,3 +177,5 @@ public class DAO <T> {
     }
 
 }
+
+
