@@ -17,13 +17,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
+
+import java.time.LocalDate;
+import java.util.*;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
@@ -236,32 +233,45 @@ class DAOTest {
     }
 
     @Test
-    void countPeoplePerHobby() {
-        // Define expected result
-        Map<String, Integer> expectedResult = new HashMap<>();
-        expectedResult.put("Reading", 2);
-        expectedResult.put("Gardening", 3);
+    void testCountPeoplePerHobby() {
+        Hobby hobby1 = new Hobby();
+        hobby1.setName("Football");
 
-        // Mock EntityManager and TypedQuery behavior
-        when(em.createQuery(anyString(), any(Class.class))).thenReturn(typedQuery);
-        when(typedQuery.getResultList()).thenReturn(getMockResultList());
+        Hobby hobby2 = new Hobby();
+        hobby2.setName("Swimming");
 
-        // Invoke the method to get the count of people per hobby
-        Map<String, Integer> actualResult = dao.countPeoplePerHobby();
+        Person person1 = new Person();
+        person1.setFirstName("John");
+        person1.setEmail("john@example.com"); // Set the email address
+        person1.addHobby(hobby1);
 
-        // Verify the results
-        assertEquals(expectedResult, actualResult);
+        Person person2 = new Person();
+        person2.setFirstName("Emily");
+        person2.setEmail("emily@example.com"); // Set the email address
+        person2.addHobby(hobby1);
+        person2.addHobby(hobby2);
+
+        em.getTransaction().begin();
+        em.persist(hobby1);
+        em.persist(hobby2);
+        em.persist(person1);
+        em.persist(person2);
+        em.getTransaction().commit();
+
+
+        Map<String, Integer> result = hobbyDAO.countPeoplePerHobby();
+        assertEquals(2, result.size());
+        assertTrue(result.containsKey("Football"));
+        assertTrue(result.containsKey("Swimming"));
+        assertEquals(2, result.get("Football"));
+        assertEquals(1, result.get("Swimming"));
     }
 
 
-    private List<Object[]> getMockResultList() {
-        List<Object[]> resultList = new ArrayList<>();
-        // Mock data for "Reading" hobby
-        resultList.add(new Object[]{"Reading", 2L});
-        // Mock data for "Gardening" hobby
-        resultList.add(new Object[]{"Gardening", 3L});
-        return resultList;
-    }
+
+
+
+
 
     @Test
     public void testAllPersonWithAGivenHobby() {
