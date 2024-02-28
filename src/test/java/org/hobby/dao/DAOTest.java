@@ -10,10 +10,15 @@ import org.hobby.model.ZipDTO;
 import org.hobby.model.ZipCode;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,9 +37,11 @@ class DAOTest {
         hobbyDAO = new DAO<>();
         personDAO = new DAO<>();
         zipCodeDAO = new DAO<>();
-        Query query = em.createNativeQuery("DELETE FROM person");
+        Query query = em.createNativeQuery("DELETE FROM hobby_person");
+        Query query2 = em.createNativeQuery("DELETE FROM person");
         em.getTransaction().begin();
         query.executeUpdate();
+        query2.executeUpdate();
         em.getTransaction().commit();
 
     }
@@ -44,33 +51,31 @@ class DAOTest {
         em.close();
     }
 
-    @Nested
-    class PostnummerDAOTest {
 
-        @Test
-        void getPostnummer_ShouldReturnPostnummerDTO() {
+    @Test
+    void getPostnummer_ShouldReturnPostnummerDTO() {
 
-            try {
-                ZipDTO postnummer = zipCodeDAO.getZip("2000");
-                assertNotNull(postnummer);
-                assertEquals("1050", postnummer.getNr());
-                assertEquals("København K", postnummer.getNavn());
-            } catch (IOException e) {
-                fail("IOException thrown: " + e.getMessage());
-            }
-        }
-
-        @Test
-        void getPostnummer_WithInvalidPostnummer_ShouldReturnNull() {
-
-            try {
-                ZipDTO postnummer = zipCodeDAO.getZip("2000"); // Invalid postnummer
-                assertNull(postnummer);
-            } catch (IOException e) {
-                fail("IOException thrown: " + e.getMessage());
-            }
+        try {
+            ZipDTO postnummer = zipCodeDAO.getZip("2000");
+            assertNotNull(postnummer);
+            assertEquals("1050", postnummer.getNr());
+            assertEquals("København K", postnummer.getNavn());
+        } catch (IOException e) {
+            fail("IOException thrown: " + e.getMessage());
         }
     }
+
+    @Test
+    void getPostnummer_WithInvalidPostnummer_ShouldReturnNull() {
+
+        try {
+            ZipDTO postnummer = zipCodeDAO.getZip("2000"); // Invalid postnummer
+            assertNull(postnummer);
+        } catch (IOException e) {
+            fail("IOException thrown: " + e.getMessage());
+        }
+    }
+
 
     // just need to populate the database with hobby data, person data and hobby_person data
     @Test
@@ -79,6 +84,47 @@ class DAOTest {
         Map<String, Integer> hobbiesPerPerson = personDAO.countHobbiesPerPersonOnAddress(address);
         assertEquals(2, hobbiesPerPerson.size()); // Assuming there are two persons with hobbies at this address
         assertEquals(Integer.valueOf(2), hobbiesPerPerson.get("John Doe")); // John Doe has 2 hobbies
+    }
+
+    @Test
+    public void getNumberOfPeopleWithHobby() throws IOException {
+
+        Hobby hobby = hobbyDAO.findById(23, Hobby.class);
+        Hobby hobby1 = hobbyDAO.findById(23, Hobby.class);
+
+        Person person = Person.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .birthDate(new Date(1990, 1, 1))
+                .phone("12345678")
+                .ZipCode(zipCodeDAO.findById(2505, ZipCode.class))
+                .address("123 Main St")
+                .email("mail@mail.com")
+                .gender(Person.Gender.MALE)
+                .hobbies(new HashSet<>())
+                .build();
+        person.setZipCode(zipCodeDAO.findById(2505, ZipCode.class));
+        person.addHobby(hobby);
+        personDAO.save(person);
+
+        Person person2 = Person.builder()
+                .firstName("Jane")
+                .lastName("Doe")
+                .birthDate(new Date(1990, 1, 1))
+                .phone("12345678")
+                .address("123 Main St")
+                .email("mail2@mail2.com")
+                .gender(Person.Gender.FEMALE)
+                .hobbies(new HashSet<>())
+                .build();
+
+        person2.setZipCode(zipCodeDAO.findById(2505, ZipCode.class));
+        person2.addHobby(hobby1);
+        personDAO.save(person2);
+
+        int numberOfPeople = personDAO.getNumberOfPeopleWithHobby(hobby);
+
+        assertEquals(2, numberOfPeople); // Assuming there are two persons with the hobby "Soccer"
     }
 
 }
