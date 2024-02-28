@@ -4,8 +4,7 @@ package org.hobby.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "person")
@@ -49,11 +48,11 @@ public class Person {
     @Column(name = "address")
     private String address;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private ZipCode ZipCode;
 
-    @ManyToMany(mappedBy = "persons")
-    private List<Hobby> hobbies;
+    @ManyToMany(mappedBy = "persons",cascade = CascadeType.ALL)
+    private Set<Hobby> hobbies = new HashSet<>();
 
     public Person(String firstName, String lastName, Date birthDate, Gender gender, String phone, String email, String address) {
         this.firstName = firstName;
