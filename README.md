@@ -15,4 +15,18 @@ The business idea is to create a platform that not only provides information abo
 
 
 
+Technical Requirements:
+- JPA
+- JPQL
+- Java Streams API
+- Java Generics
+- Maven
+- JDK 17^
+- JUnit 5
+- Docker
+- PostgresSQL
+- pgAdmin
+- Lombok
+
+
 
