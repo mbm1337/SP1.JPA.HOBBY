@@ -145,7 +145,6 @@ class DAOTest {
     }
 
 
-    // just need to populate the database with hobby data, person data and hobby_person data
     @Test
     public void countHobbiesPerPersonOnAddress() {
         Hobby hobby1 = hobbyDAO.findById(1, Hobby.class);
@@ -202,7 +201,6 @@ class DAOTest {
                 .lastName("Doe")
                 .birthDate(new Date(1990, 1, 1))
                 .phone("12345678")
-                .ZipCode(zipCodeDAO.findById(2505, ZipCode.class))
                 .address("123 Main St")
                 .email("mail@mail.com")
                 .gender(Person.Gender.MALE)
@@ -229,16 +227,16 @@ class DAOTest {
 
         int numberOfPeople = personDAO.getNumberOfPeopleWithHobby(hobby);
 
-        assertEquals(2, numberOfPeople); // Assuming there are two persons with the hobby "Soccer"
+        assertEquals(2, numberOfPeople);
     }
 
     @Test
     void testCountPeoplePerHobby() {
-        Hobby hobby1 = new Hobby();
-        hobby1.setName("Football");
+        Hobby hobby1 = hobbyDAO.findById(279, Hobby.class);// Fodbold
 
-        Hobby hobby2 = new Hobby();
-        hobby2.setName("Swimming");
+        Hobby hobby2 = hobbyDAO.findById(438, Hobby.class);// Vandpolo
+        Hobby hobby3 = hobbyDAO.findById(279, Hobby.class);// Fodbold
+
 
         Person person1 = new Person();
         person1.setFirstName("John");
@@ -248,23 +246,20 @@ class DAOTest {
         Person person2 = new Person();
         person2.setFirstName("Emily");
         person2.setEmail("emily@example.com"); // Set the email address
-        person2.addHobby(hobby1);
         person2.addHobby(hobby2);
+        person2.addHobby(hobby3);
 
-        em.getTransaction().begin();
-        em.persist(hobby1);
-        em.persist(hobby2);
-        em.persist(person1);
-        em.persist(person2);
-        em.getTransaction().commit();
+       personDAO.save(person1);
+       personDAO.save(person2);
 
 
         Map<String, Integer> result = hobbyDAO.countPeoplePerHobby();
-        assertEquals(2, result.size());
-        assertTrue(result.containsKey("Football"));
-        assertTrue(result.containsKey("Swimming"));
-        assertEquals(2, result.get("Football"));
-        assertEquals(1, result.get("Swimming"));
+        assertNotNull(result);
+        assertEquals(2, result.get("Fodbold"));
+        assertTrue(result.containsKey("Fodbold"));
+        assertTrue(result.containsKey("Vandpolo"));
+        assertEquals(2, result.get("Fodbold"));
+        assertEquals(1, result.get("Vandpolo"));
     }
 
 
