@@ -176,6 +176,15 @@ public class DAO <T> {
         }
     }
 
+    public Person getPersonByEmailAddress(String email) {
+        EntityManager em = emf.createEntityManager();
+        Person person = em.createQuery("SELECT p FROM Person p WHERE p.email = :email", Person.class)
+                .setParameter("email", email)
+                .getSingleResult();
+        return person;
+
+    }
+
 }
 
 

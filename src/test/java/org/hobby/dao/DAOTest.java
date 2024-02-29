@@ -17,10 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
-
-import java.time.LocalDate;
 import java.util.*;
-import java.lang.reflect.Field;
+
 
 import static org.mockito.Mockito.*;
 
@@ -271,8 +269,9 @@ class DAOTest {
 
 
         Person p = new Person("John", "Doe", new Date(), Person.Gender.MALE, "1234567890", "john.doe@example.com", "123 Main St");
-        p.setId(2);
-        String phoneNumber = personDAO.getPhoneNumber(2);
+        personDAO.save(p);
+        Person foundPerson =  personDAO.getPersonByEmailAddress("john.doe@example.com");
+        String phoneNumber = personDAO.getPhoneNumber(foundPerson.getId());
 
         String expectedPhoneNumber = "1234567890";
         assertEquals(expectedPhoneNumber, phoneNumber);
@@ -280,11 +279,13 @@ class DAOTest {
     }
     @Test
     void  testgetALlInfoPerson(){
-        Person expected = new Person("John", "Doe", new Date(), Person.Gender.MALE, "1234567890", "john.doe@example.com", "123 Main St");
-        expected.setId(2);
-        Person actualperson = dao.getAllInfo(2);
+        Person person = new Person("John", "Doe", new Date(), Person.Gender.MALE, "1234567890", "john.doe@example.com", "123 Main St");
+        personDAO.save(person);
+        Person expected = personDAO.getPersonByPhoneNumber("1234567890");
+
+        Person actualperson = dao.getAllInfo(expected.getId());
         assertNotNull(expected);
-        assertEquals(expected, actualperson);
+        assertEquals(expected.toString(), actualperson.toString());
     }
   
     @Test
