@@ -3,12 +3,10 @@ package org.hobby.dao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Query;
-import jakarta.persistence.TypedQuery;
 import org.hobby.config.HibernateConfig;
 import org.hobby.model.Hobby;
 import org.hobby.model.Person;
 import org.hobby.model.ZipDTO;
-import org.hobby.model.ZipCode;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -30,9 +28,10 @@ class DAOTest {
     private static PersonDAO personDAO;
     private static ZipCodeDAO zipCodeDAO;
     private static EntityManager em;
+
+
+    @Mock
     private static HobbyDAO mockHobbyDAO;
-
-
     @Mock
     private static Query mockQuery;
     @Mock
@@ -54,9 +53,7 @@ class DAOTest {
         mockEntityManagerFactory = mock(EntityManagerFactory.class);
         mockEntityManager = mock(EntityManager.class);
         mockHobbyDAO.emf = mockEntityManagerFactory;
-
         mockQuery = mock(Query.class);
-
         when(mockEntityManagerFactory.createEntityManager()).thenReturn(mockEntityManager);
         when(mockEntityManager.createQuery(anyString())).thenReturn(mockQuery);
 
@@ -295,6 +292,7 @@ class DAOTest {
 
         Assert.assertEquals(expectedPersons, actualPersons);
     }
+    
 
 }
 
