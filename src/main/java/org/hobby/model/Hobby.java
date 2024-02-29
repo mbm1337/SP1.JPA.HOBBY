@@ -33,7 +33,7 @@ public class Hobby {
     @Column(name = "type")
     private String type;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Person> persons = new HashSet<>();
 
 

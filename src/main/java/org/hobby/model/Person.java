@@ -48,10 +48,10 @@ public class Person {
     @Column(name = "address")
     private String address;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private ZipCode ZipCode;
 
-    @ManyToMany(mappedBy = "persons",cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "persons", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Hobby> hobbies = new HashSet<>();
 
     public Person(String firstName, String lastName, Date birthDate, Gender gender, String phone, String email, String address) {
