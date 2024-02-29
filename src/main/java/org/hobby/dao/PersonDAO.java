@@ -19,37 +19,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class DAO <T> {
+public class PersonDAO  implements IDAO<Person> {
 
     EntityManagerFactory emf = HibernateConfig.getEntityManagerFactoryConfig();
 
-    public void save(T t) {
+    @Override
+    public void create(Person person) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        if (!em.contains(t)) {
-            t = em.merge(t);
+        if (!em.contains(person)) {
+            person = em.merge(person);
         }
-        em.persist(t);
+        em.persist(person);
         em.getTransaction().commit();
         em.close();
     }
 
-    public T findById(int id, Class<T> t) {
+    @Override
+    public Person read(int id) {
         EntityManager em = emf.createEntityManager();
-        T foundT = em.find(t, id);
+        Person foundPerson = em.find(Person.class, id);
         em.close();
-        return foundT;
+        return foundPerson;
     }
 
-    public void delete(T t) {
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        em.remove(t);
-        em.getTransaction().commit();
-        em.close();
-    }
-
-    public void update(T t) {
+    @Override
+    public void update(Person t) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
         em.merge(t);
@@ -57,21 +52,16 @@ public class DAO <T> {
         em.close();
     }
 
-    public int getNumberOfPeopleWithHobby(Hobby hobby) {
+    @Override
+    public void delete(Person t) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        int numberOfPeople = em.createQuery("SELECT p FROM Person p WHERE :hobby MEMBER OF p.hobbies", Hobby.class).setParameter("hobby", hobby).getResultList().size();
+        em.remove(t);
         em.getTransaction().commit();
         em.close();
-        return numberOfPeople;
     }
 
-    public List<Object[]> getAllPostcodesAndCities() {
-        EntityManager em = emf.createEntityManager();
-        String jpql = "SELECT DISTINCT z.zip, z.city FROM ZipCode z";
-        TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
-        return query.getResultList();
-    }
+
     public List<Person> getPersonsByCity(String zip) {
         EntityManager em = emf.createEntityManager();
         String jpql = "SELECT p FROM Person p WHERE p.ZipCode = :zip";
@@ -106,47 +96,7 @@ public class DAO <T> {
       
     }
 
-    public Map<String, Integer> countPeoplePerHobby() {
-        EntityManager em = emf.createEntityManager();
-        String jpql = "SELECT h.name, COUNT(p.id) FROM Hobby h LEFT JOIN h.persons p GROUP BY h.name";
-        TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
-        List<Object[]> resultList = query.getResultList();
 
-        Map<String, Integer> peoplePerHobby = new HashMap<>();
-        for (Object[] result : resultList) {
-            String hobbyName = (String) result[0];
-            Long count = (Long) result[1];
-            peoplePerHobby.put(hobbyName, count.intValue());
-        }
-        return peoplePerHobby;
-
-    }
-
-    public ZipDTO getZip(String nr) throws IOException {
-        String API_URL = "https://api.dataforsyningen.dk/postnumre/";
-
-        String apiUrl = API_URL + nr;
-        URL url = new URL(apiUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-
-        int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-            reader.close();
-
-            Gson gson = new Gson();
-            return gson.fromJson(response.toString(), ZipDTO.class);
-        } else {
-            System.out.println("Fejl ved forespørgsel til API. Statuskode: " + responseCode);
-            return null;
-        }
-    }
     public String getPhoneNumber(int id) {
         try (EntityManager em = emf.createEntityManager()) {
             Query query = em.createQuery("SELECT p.phone FROM Person p WHERE p.id = :id", String.class);
@@ -165,16 +115,7 @@ public class DAO <T> {
         return  person;
     }
 
-    public List<Person> allPersonWithAGivenHobby(String hobbyName) {
-        try (EntityManager em = emf.createEntityManager()) {
-            Query query = em.createQuery("SELECT h FROM Hobby h " +
-                    "JOIN  h.persons p " +
-                    "WHERE h.name = :hobbyName");
-            query.setParameter("hobbyName", hobbyName);
-            return query.getResultList();
 
-        }
-    }
 
     public Person getPersonByEmailAddress(String email) {
         EntityManager em = emf.createEntityManager();
