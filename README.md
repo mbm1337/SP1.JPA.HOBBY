@@ -14,6 +14,12 @@ The business idea is to create a platform that not only provides information abo
 ![ERD](images/ERD.png)
 
 
+Group work:
+- We have been using GitHub to share our code and work on the project together.
+- We used issues to keep track of what needs to be done and who is working on what.
+- First couple of days we worked together at school, but after that we have been working from home and using Discord to communicate.
+
+
 
 
 Technical Requirements:

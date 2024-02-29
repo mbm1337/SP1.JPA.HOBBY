@@ -292,7 +292,7 @@ class DAOTest {
 
         Assert.assertEquals(expectedPersons, actualPersons);
     }
-    
+
 
 }
 
