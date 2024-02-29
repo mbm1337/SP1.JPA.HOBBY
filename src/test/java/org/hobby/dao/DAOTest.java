@@ -26,16 +26,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DAOTest {
 
-    private static DAO<Hobby> hobbyDAO;
-    private static DAO<Person> personDAO;
-    private static DAO<ZipCode> zipCodeDAO;
+    private static HobbyDAO hobbyDAO;
+    private static PersonDAO personDAO;
+    private static ZipCodeDAO zipCodeDAO;
     private static EntityManager em;
-    private static DAO<Hobby> mockHobbyDAO;
+    private static HobbyDAO mockHobbyDAO;
 
-
-    private static TypedQuery<Object[]> typedQuery;
-
-    private static DAO dao;
 
     @Mock
     private static Query mockQuery;
@@ -49,16 +45,12 @@ class DAOTest {
     static void setUp() throws NoSuchFieldException, IllegalAccessException {
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactoryConfig();
         em = emf.createEntityManager();
-        hobbyDAO = new DAO<>();
-        personDAO = new DAO<>();
-        zipCodeDAO = new DAO<>();
+        hobbyDAO = new HobbyDAO();
+        personDAO = new PersonDAO();
+        zipCodeDAO = new ZipCodeDAO();
 
-        // Check if dao is null and instantiate it if necessary
-        if (dao == null) {
-            dao = new DAO();
-        }
 
-        mockHobbyDAO = new DAO<>();
+        mockHobbyDAO = new HobbyDAO();
         mockEntityManagerFactory = mock(EntityManagerFactory.class);
         mockEntityManager = mock(EntityManager.class);
         mockHobbyDAO.emf = mockEntityManagerFactory;
@@ -69,7 +61,6 @@ class DAOTest {
         when(mockEntityManager.createQuery(anyString())).thenReturn(mockQuery);
 
 
-        typedQuery = mock(TypedQuery.class);
     }
 
     @BeforeEach
@@ -108,12 +99,12 @@ class DAOTest {
                 .lastName("Doe")
                 .birthDate(new Date(1990, 1, 1))
                 .phone("1234567890")
-                .ZipCode(zipCodeDAO.findById(2000, ZipCode.class))
+                .ZipCode(zipCodeDAO.read(2000))
                 .address("123 Main St")
                 .email("john.doe@example.com")
                 .gender(Person.Gender.MALE)
                 .build();
-        personDAO.save(person);
+        personDAO.create(person);
         // Retrieve a person by their phone number
         Person foundPerson = personDAO.getPersonByPhoneNumber("1234567890");
 
@@ -145,26 +136,26 @@ class DAOTest {
 
     @Test
     public void countHobbiesPerPersonOnAddress() {
-        Hobby hobby1 = hobbyDAO.findById(1, Hobby.class);
-        Hobby hobby2 = hobbyDAO.findById(2, Hobby.class);
-        Hobby hobby3 = hobbyDAO.findById(3, Hobby.class);
-        Hobby hobby4 = hobbyDAO.findById(4, Hobby.class);
+        Hobby hobby1 = hobbyDAO.read(1);
+        Hobby hobby2 = hobbyDAO.read(2);
+        Hobby hobby3 = hobbyDAO.read(3);
+        Hobby hobby4 = hobbyDAO.read(4);
 
         Person person = Person.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .birthDate(new Date(1990, 1, 1))
                 .phone("12345678")
-                .ZipCode(zipCodeDAO.findById(2505, ZipCode.class))
+                .ZipCode(zipCodeDAO.read(2505))
                 .address("123 Main St")
                 .email("mail@mail.com")
                 .gender(Person.Gender.MALE)
                 .hobbies(new HashSet<>())
                 .build();
-        person.setZipCode(zipCodeDAO.findById(2505, ZipCode.class));
+        person.setZipCode(zipCodeDAO.read(2505));
         person.addHobby(hobby1);
         person.addHobby(hobby2);
-        personDAO.save(person);
+        personDAO.create(person);
 
         Person person2 = Person.builder()
                 .firstName("Jane")
@@ -176,10 +167,10 @@ class DAOTest {
                 .gender(Person.Gender.FEMALE)
                 .hobbies(new HashSet<>())
                 .build();
-        person2.setZipCode(zipCodeDAO.findById(2505, ZipCode.class));
+        person2.setZipCode(zipCodeDAO.read(2505));
         person2.addHobby(hobby3);
         person2.addHobby(hobby4);
-        personDAO.save(person2);
+        personDAO.create(person2);
 
 
         String address = "123 Main St";
@@ -191,8 +182,8 @@ class DAOTest {
     @Test
     public void getNumberOfPeopleWithHobby() throws IOException {
 
-        Hobby hobby = hobbyDAO.findById(23, Hobby.class);
-        Hobby hobby1 = hobbyDAO.findById(23, Hobby.class);
+        Hobby hobby = hobbyDAO.read(23);
+        Hobby hobby1 = hobbyDAO.read(23);
 
         Person person = Person.builder()
                 .firstName("John")
@@ -204,9 +195,9 @@ class DAOTest {
                 .gender(Person.Gender.MALE)
                 .hobbies(new HashSet<>())
                 .build();
-        person.setZipCode(zipCodeDAO.findById(2505, ZipCode.class));
+        person.setZipCode(zipCodeDAO.read(2505));
         person.addHobby(hobby);
-        personDAO.save(person);
+        personDAO.create(person);
 
         Person person2 = Person.builder()
                 .firstName("Jane")
@@ -219,21 +210,21 @@ class DAOTest {
                 .hobbies(new HashSet<>())
                 .build();
 
-        person2.setZipCode(zipCodeDAO.findById(2505, ZipCode.class));
+        person2.setZipCode(zipCodeDAO.read(2505));
         person2.addHobby(hobby1);
-        personDAO.save(person2);
+        personDAO.create(person2);
 
-        int numberOfPeople = personDAO.getNumberOfPeopleWithHobby(hobby);
+        int numberOfPeople = hobbyDAO.getNumberOfPeopleWithHobby(hobby);
 
         assertEquals(2, numberOfPeople);
     }
 
     @Test
     void testCountPeoplePerHobby() {
-        Hobby hobby1 = hobbyDAO.findById(279, Hobby.class);// Fodbold
+        Hobby hobby1 = hobbyDAO.read(279);// Fodbold
 
-        Hobby hobby2 = hobbyDAO.findById(438, Hobby.class);// Vandpolo
-        Hobby hobby3 = hobbyDAO.findById(279, Hobby.class);// Fodbold
+        Hobby hobby2 = hobbyDAO.read(438);// Vandpolo
+        Hobby hobby3 = hobbyDAO.read(279);// Fodbold
 
 
         Person person1 = new Person();
@@ -247,8 +238,8 @@ class DAOTest {
         person2.addHobby(hobby2);
         person2.addHobby(hobby3);
 
-       personDAO.save(person1);
-       personDAO.save(person2);
+       personDAO.create(person1);
+       personDAO.create(person2);
 
 
         Map<String, Integer> result = hobbyDAO.countPeoplePerHobby();
@@ -261,15 +252,13 @@ class DAOTest {
     }
 
 
-
-
     
     @Test
     void testGetPhoneNumber() {
 
 
         Person p = new Person("John", "Doe", new Date(), Person.Gender.MALE, "1234567890", "john.doe@example.com", "123 Main St");
-        personDAO.save(p);
+        personDAO.create(p);
         Person foundPerson =  personDAO.getPersonByEmailAddress("john.doe@example.com");
         String phoneNumber = personDAO.getPhoneNumber(foundPerson.getId());
 
@@ -280,10 +269,10 @@ class DAOTest {
     @Test
     void  testgetALlInfoPerson(){
         Person person = new Person("John", "Doe", new Date(), Person.Gender.MALE, "1234567890", "john.doe@example.com", "123 Main St");
-        personDAO.save(person);
+        personDAO.create(person);
         Person expected = personDAO.getPersonByPhoneNumber("1234567890");
 
-        Person actualperson = dao.getAllInfo(expected.getId());
+        Person actualperson = personDAO.getAllInfo(expected.getId());
         assertNotNull(expected);
         assertEquals(expected.toString(), actualperson.toString());
     }
