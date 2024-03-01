@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HobbyDAO implements IDAO<Hobby> {
+public class HobbyDAO implements IDAO<Hobby, Integer> {
     EntityManagerFactory emf = HibernateConfig.getEntityManagerFactoryConfig();
 
     @Override
@@ -28,7 +28,7 @@ public class HobbyDAO implements IDAO<Hobby> {
     }
 
     @Override
-    public Hobby read(int id) {
+    public Hobby read(Integer id) {
         EntityManager em = emf.createEntityManager();
         Hobby foundHobby = em.find(Hobby.class, id);
         em.close();

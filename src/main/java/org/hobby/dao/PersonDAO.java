@@ -1,25 +1,17 @@
 package org.hobby.dao;
 
-import com.google.gson.Gson;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.hobby.config.HibernateConfig;
-import org.hobby.model.Hobby;
 import org.hobby.model.Person;
-import org.hobby.model.ZipDTO;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class PersonDAO  implements IDAO<Person> {
+public class PersonDAO  implements IDAO<Person, Integer> {
 
     EntityManagerFactory emf = HibernateConfig.getEntityManagerFactoryConfig();
 
@@ -36,7 +28,7 @@ public class PersonDAO  implements IDAO<Person> {
     }
 
     @Override
-    public Person read(int id) {
+    public Person read(Integer id) {
         EntityManager em = emf.createEntityManager();
         Person foundPerson = em.find(Person.class, id);
         em.close();
