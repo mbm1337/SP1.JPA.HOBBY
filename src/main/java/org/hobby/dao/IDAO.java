@@ -1,10 +1,12 @@
 package org.hobby.dao;
 
-public interface IDAO <T> {
+import org.hobby.model.Person;
+
+public interface IDAO <T,V> {
 
     public void create(T t);
+    public T read(V id);
 
-    public Object read(int id);
     public void update(T t);
     public void delete(T t);
 }

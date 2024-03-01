@@ -15,7 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
-public class ZipCodeDAO implements IDAO<ZipCode> {
+public class ZipCodeDAO implements IDAO<ZipCode,Integer> {
 
     EntityManagerFactory emf = HibernateConfig.getEntityManagerFactoryConfig();
 
@@ -33,7 +33,7 @@ public class ZipCodeDAO implements IDAO<ZipCode> {
     }
 
     @Override
-    public ZipCode read(int id) {
+    public ZipCode read(Integer id) {
         EntityManager em = emf.createEntityManager();
         ZipCode foundZipCode = em.find(ZipCode.class, id);
         em.close();
